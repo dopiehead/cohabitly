@@ -1,0 +1,41 @@
+parameters:
+    mercure.jwt_secret: '%env(MERCURE_JWT_SECRET)%'
+
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+        bind:
+            string $mercureKey: '%mercure.jwt_secret%'
+
+    App\Security\JWTAuthenticationSuccessHandler:
+        arguments:
+            $jwtManager: '@lexik_jwt_authentication.jwt_manager'
+
+    # Redis client
+    Redis:
+        class: Redis
+        calls:
+            - connect:
+                  - '%env(resolve:REDIS_HOST)%'
+                  - '%env(int:REDIS_PORT)%'
+                  
+    App\EventListener\PropertyCreatedListener:
+        tags:
+            - { name: 'kernel.event_listener', event: 'property.created', method: 'onPropertyCreated' }
+
+    App\EventListener\JWTFailureListener:
+        tags:
+            - { name: kernel.event_listener, event: lexik_jwt_authentication.on_authentication_failure, method: onAuthenticationFailureResponse }
+    App\Service\PaystackService:
+        arguments:
+            $paystackSecretKey: '%env(PAYSTACK_SECRET_KEY)%'       
+
+    # Redis session handler
+    Symfony\Component\HttpFoundation\Session\Storage\Handler\RedisSessionHandler:
+        arguments:
+            - '@Redis'
+
+    # App services
+    App\:
+        resource: '../src/'
