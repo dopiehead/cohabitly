@@ -32,10 +32,18 @@ security:
             jwt: ~
 
     access_control:
-        # Public routes
+        # Public auth routes
         - { path: ^/api/login, roles: PUBLIC_ACCESS }
-        - { path: ^/api/register, roles: PUBLIC_ACCESS }
+        - { path: ^/api/auth/register, roles: PUBLIC_ACCESS }
+        - { path: ^/api/auth/verify-email, roles: PUBLIC_ACCESS }
+        - { path: ^/api/auth/refresh, roles: PUBLIC_ACCESS }
+        - { path: ^/api/auth/forgot-password, roles: PUBLIC_ACCESS }
+        - { path: ^/api/auth/reset-password, roles: PUBLIC_ACCESS }
 
-        # JWT-protected routes
+        # Public listing browsing
+        - { path: ^/api/listing$, roles: PUBLIC_ACCESS, methods: [GET] }
+        - { path: ^/api/listing/search, roles: PUBLIC_ACCESS }
+        - { path: ^/api/listing/\d+$, roles: PUBLIC_ACCESS, methods: [GET] }
+
+        # Everything else requires auth
         - { path: ^/api, roles: ROLE_USER }
-

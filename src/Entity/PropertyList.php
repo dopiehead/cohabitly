@@ -10,6 +10,11 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Table(name: "property_lists")]
 class PropertyList
 {
+    public const STATUS_DRAFT    = 'draft';
+    public const STATUS_ACTIVE   = 'active';
+    public const STATUS_CLOSED   = 'closed';
+    public const STATUS_ARCHIVED = 'archived';
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: "integer")]
@@ -26,11 +31,17 @@ class PropertyList
     #[Assert\NotBlank]
     private string $location;
 
+    #[ORM\Column(type: "string", length: 50, nullable: true)]
+    private ?string $state = null;
+
     #[ORM\Column(type: "json", nullable: true)]
     private array $property_images = [];
     
     #[ORM\Column(type: "string", length: 100, nullable: true)]
     private ?string $lga = null;
+
+    #[ORM\Column(type: "string", length: 50, nullable: true)]
+    private ?string $type = null;
 
     #[ORM\Column(type: "decimal", precision: 10, scale: 2)]
     #[Assert\NotBlank]
@@ -42,11 +53,26 @@ class PropertyList
     #[ORM\Column(type: "integer")]
     private int $bathrooms = 1;
 
+    #[ORM\Column(type: "integer")]
+    private int $toilets = 1;
+
+    #[ORM\Column(type: "boolean")]
+    private bool $parkingSpace = false;
+
     #[ORM\Column(type: "boolean")]
     private bool $featured = false;
 
+    #[ORM\Column(length: 20)]
+    private string $status = self::STATUS_DRAFT;
+
+    #[ORM\Column(type: "date", nullable: true)]
+    private ?\DateTimeInterface $availableFrom = null;
+
     #[ORM\Column(type: "datetime")]
     private \DateTimeInterface $createdAt;
+
+    #[ORM\Column(type: "datetime")]
+    private \DateTimeInterface $updatedAt;
 
     #[ORM\ManyToOne(targetEntity: "App\Entity\User")]
     #[ORM\JoinColumn(nullable: false)]
@@ -55,6 +81,7 @@ class PropertyList
     public function __construct()
     {
         $this->createdAt = new \DateTime();
+        $this->updatedAt = new \DateTime();
     }
 
     // -----------------------
@@ -165,19 +192,29 @@ class PropertyList
         return $this;
     }
 
-    public function getCreatedAt(): \DateTimeInterface
-    {
-        return $this->createdAt;
-    }
+    public function getState(): ?string { return $this->state; }
+    public function setState(?string $state): self { $this->state = $state; return $this; }
 
-    public function getOwner(): User
-    {
-        return $this->owner;
-    }
+    public function getType(): ?string { return $this->type; }
+    public function setType(?string $type): self { $this->type = $type; return $this; }
 
-    public function setOwner(User $owner): self
-    {
-        $this->owner = $owner;
-        return $this;
-    }
+    public function getToilets(): int { return $this->toilets; }
+    public function setToilets(int $toilets): self { $this->toilets = $toilets; return $this; }
+
+    public function hasParkingSpace(): bool { return $this->parkingSpace; }
+    public function setParkingSpace(bool $parkingSpace): self { $this->parkingSpace = $parkingSpace; return $this; }
+
+    public function getStatus(): string { return $this->status; }
+    public function setStatus(string $status): self { $this->status = $status; return $this; }
+
+    public function getAvailableFrom(): ?\DateTimeInterface { return $this->availableFrom; }
+    public function setAvailableFrom(?\DateTimeInterface $availableFrom): self { $this->availableFrom = $availableFrom; return $this; }
+
+    public function getCreatedAt(): \DateTimeInterface { return $this->createdAt; }
+
+    public function getUpdatedAt(): \DateTimeInterface { return $this->updatedAt; }
+    public function touch(): void { $this->updatedAt = new \DateTime(); }
+
+    public function getOwner(): User { return $this->owner; }
+    public function setOwner(User $owner): self { $this->owner = $owner; return $this; }
 }

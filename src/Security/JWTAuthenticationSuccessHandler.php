@@ -1,34 +1,36 @@
 <?php
 
-// src/Security/JWTAuthenticationSuccessHandler.php
-
 namespace App\Security;
 
+use App\Entity\User;
+use App\Repository\UserRepository;
 use App\Service\MercureJwtGenerator;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Security\Http\Authentication\AuthenticationSuccessHandlerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Http\Authentication\AuthenticationSuccessHandlerInterface;
 
 class JWTAuthenticationSuccessHandler implements AuthenticationSuccessHandlerInterface
 {
-    private $jwtManager;
-    private $mercureJwt;
-
     public function __construct(
-        JWTTokenManagerInterface $jwtManager,
-        MercureJwtGenerator $mercureJwt
-    ) {
-        $this->jwtManager = $jwtManager;
-        $this->mercureJwt = $mercureJwt;
-    }
+        private JWTTokenManagerInterface $jwtManager,
+        private MercureJwtGenerator $mercureJwt,
+        private UserRepository $userRepository
+    ) {}
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token): JsonResponse
     {
+        /** @var User $user */
         $user = $token->getUser();
 
-        $jwt = $this->jwtManager->create($user);
+        $accessToken = $this->jwtManager->create($user);
+
+        // Issue and store hashed refresh token
+        $rawRefresh    = bin2hex(random_bytes(32));
+        $hashedRefresh = hash('sha256', $rawRefresh);
+        $user->setRefreshToken($hashedRefresh);
+        $this->userRepository->save($user);
 
         $mercureToken = $this->mercureJwt->generate(
             ["/user/{$user->getId()}"],
@@ -36,13 +38,15 @@ class JWTAuthenticationSuccessHandler implements AuthenticationSuccessHandlerInt
         );
 
         return new JsonResponse([
-            'token' => $jwt,
-            // 'mercure_token' => $mercureToken,
-            'user' => [
-                'id' => $user->getId(),
+            'status'        => true,
+            'access_token'  => $accessToken,
+            'refresh_token' => $rawRefresh,
+            'user'          => [
+                'id'    => $user->getId(),
                 'email' => $user->getUserIdentifier(),
                 'roles' => $user->getRoles(),
-            ]
+                'role'  => $user->getUserRole(),
+            ],
         ]);
     }
 }

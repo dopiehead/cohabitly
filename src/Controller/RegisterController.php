@@ -63,15 +63,14 @@ final class RegisterController extends AbstractController
 
         // Create user via repository
         $user = $userRepository->createUser([
-       
-            'user_name' => $username,
-            '' => $userEmail,
+            'user_name'     => $username,
+            'user_email'    => $userEmail,
             'user_password' => $password,
-            'user_phone' => $data['phone'] ?? null,
+            'user_phone'    => $data['phone'] ?? null,
             'user_location' => $data['location'] ?? null,
-            'lga' => $data['lga'] ?? null,
-            'user_address' => $data['address'] ?? null,
-            'user_gender' => $data['gender'] ?? null,
+            'lga'           => $data['lga'] ?? null,
+            'user_address'  => $data['address'] ?? null,
+            'user_gender'   => $data['gender'] ?? null,
         ]);
 
         // Generate verification URL

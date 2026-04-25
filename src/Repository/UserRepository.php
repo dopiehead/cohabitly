@@ -17,6 +17,20 @@ class UserRepository extends ServiceEntityRepository
         $this->passwordHasher = $passwordHasher;
     }
 
+    public function save(User $user, bool $flush = true): void
+    {
+        $em = $this->getEntityManager();
+        $em->persist($user);
+        if ($flush) {
+            $em->flush();
+        }
+    }
+
+    public function findOneBy(array $criteria, ?array $orderBy = null): ?User
+    {
+        return parent::findOneBy($criteria, $orderBy);
+    }
+
     // ========================
     // Update Helpers
     // ========================

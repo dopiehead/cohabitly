@@ -2,88 +2,56 @@
 
 namespace App\Entity;
 
+use App\Repository\UserNotificationRepository;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: UserNotificationRepository::class)]
 #[ORM\Table(name: 'user_notification')]
 class UserNotification
 {
+    public const TYPE_APPLICATION_RECEIVED = 'application_received';
+    public const TYPE_APPLICATION_ACCEPTED = 'application_accepted';
+    public const TYPE_APPLICATION_REJECTED = 'application_rejected';
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
     private ?int $id = null;
 
-    #[ORM\Column(name: 'sender_id', type: 'integer')]
-    private int $senderId;
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
+    private User $user;
 
-    #[ORM\Column(name: 'recipient_id', type: 'integer')]
-    private int $recipientId;
+    #[ORM\Column(length: 50)]
+    private string $type;
 
-    #[ORM\Column(type: 'string', length: 255)]
-    private string $message;
+    #[ORM\Column(type: 'json')]
+    private array $payload = [];
 
     #[ORM\Column(type: 'boolean')]
-    private bool $pending = true;
+    private bool $read = false;
 
-    #[ORM\Column(type: 'datetime')]
-    private \DateTimeInterface $date;
+    #[ORM\Column(type: 'datetime_immutable')]
+    private \DateTimeImmutable $createdAt;
 
     public function __construct()
     {
-        $this->date = new \DateTime();
+        $this->createdAt = new \DateTimeImmutable();
     }
 
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
+    public function getId(): ?int { return $this->id; }
 
-    public function getSenderId(): int
-    {
-        return $this->senderId;
-    }
+    public function getUser(): User { return $this->user; }
+    public function setUser(User $user): static { $this->user = $user; return $this; }
 
-    public function setSenderId(int $senderId): self
-    {
-        $this->senderId = $senderId;
-        return $this;
-    }
+    public function getType(): string { return $this->type; }
+    public function setType(string $type): static { $this->type = $type; return $this; }
 
-    public function getRecipientId(): int
-    {
-        return $this->recipientId;
-    }
+    public function getPayload(): array { return $this->payload; }
+    public function setPayload(array $payload): static { $this->payload = $payload; return $this; }
 
-    public function setRecipientId(int $recipientId): self
-    {
-        $this->recipientId = $recipientId;
-        return $this;
-    }
+    public function isRead(): bool { return $this->read; }
+    public function markAsRead(): static { $this->read = true; return $this; }
 
-    public function getMessage(): string
-    {
-        return $this->message;
-    }
-
-    public function setMessage(string $message): self
-    {
-        $this->message = $message;
-        return $this;
-    }
-
-    public function isPending(): bool
-    {
-        return $this->pending;
-    }
-
-    public function setPending(bool $pending): self
-    {
-        $this->pending = $pending;
-        return $this;
-    }
-
-    public function getDate(): \DateTimeInterface
-    {
-        return $this->date;
-    }
+    public function getCreatedAt(): \DateTimeImmutable { return $this->createdAt; }
 }

@@ -4,11 +4,8 @@ framework:
         # failure_transport: failed
 
         transports:
-            # https://symfony.com/doc/current/messenger.html#transport-configuration
-            # async: '%env(MESSENGER_TRANSPORT_DSN)%'
-            # failed: 'doctrine://default?queue_name=failed'
-            sync: 'sync://'
-            async: '%env(REDIS_URL)%/messages'
+            sync: "sync://"
+            # async: '%env(REDIS_URL)%/messages'  # re-enable once Redis is available
 
         routing:
             # Route your messages to the transports

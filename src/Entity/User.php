@@ -72,6 +72,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: 'integer')]
     private int $user_shares = 0;
 
+    #[ORM\Column(type: 'text', nullable: true)]
+    private ?string $refreshToken = null;
+
+    #[ORM\Column(type: 'text', nullable: true)]
+    private ?string $resetToken = null;
+
+    #[ORM\Column(type: 'datetime_immutable', nullable: true)]
+    private ?\DateTimeImmutable $resetTokenExpiresAt = null;
+
+    #[ORM\Column(length: 10, nullable: true)]
+    private ?string $userRole = null;
+
     #[ORM\Column(type: 'datetime_immutable')]
     private \DateTimeImmutable $createdAt;
 
@@ -171,6 +183,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function getUserLikes(): int { return $this->user_likes; }
     public function setUserLikes(int $likes): static { $this->user_likes = $likes; return $this; }
+
+    public function getRefreshToken(): ?string { return $this->refreshToken; }
+    public function setRefreshToken(?string $refreshToken): static { $this->refreshToken = $refreshToken; return $this; }
+
+    public function getResetToken(): ?string { return $this->resetToken; }
+    public function setResetToken(?string $resetToken): static { $this->resetToken = $resetToken; return $this; }
+
+    public function getResetTokenExpiresAt(): ?\DateTimeImmutable { return $this->resetTokenExpiresAt; }
+    public function setResetTokenExpiresAt(?\DateTimeImmutable $dt): static { $this->resetTokenExpiresAt = $dt; return $this; }
+
+    public function getUserRole(): ?string { return $this->userRole; }
+    public function setUserRole(?string $userRole): static { $this->userRole = $userRole; return $this; }
 
     public function getUserShares(): int { return $this->user_shares; }
     public function setUserShares(int $shares): static { $this->user_shares = $shares; return $this; }
