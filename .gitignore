@@ -2,6 +2,8 @@
 ###> symfony/framework-bundle ###
 *.env.local
 *.env.dev
+.env.dev
+/.env.dev
 
 
 /.env.local
