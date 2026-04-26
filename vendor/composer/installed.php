@@ -1,22 +1,22 @@
 <?php return array(
     'root' => array(
-        'pretty_version' => '1.0.0+no-version-set',
-        'version' => '1.0.0.0',
+        'pretty_version' => 'dev-main',
+        'version' => 'dev-main',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
-        'reference' => null,
+        'reference' => 'c462c872bda7d19f05dd0a85c550303833be0894',
         'name' => '__root__',
         'dev' => true,
     ),
     'versions' => array(
         '__root__' => array(
-            'pretty_version' => '1.0.0+no-version-set',
-            'version' => '1.0.0.0',
+            'pretty_version' => 'dev-main',
+            'version' => 'dev-main',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
-            'reference' => null,
+            'reference' => 'c462c872bda7d19f05dd0a85c550303833be0894',
             'dev_requirement' => false,
         ),
         'api-platform/doctrine-common' => array(
@@ -840,12 +840,12 @@
             'dev_requirement' => false,
         ),
         'symfony/messenger' => array(
-            'pretty_version' => 'v8.0.6',
-            'version' => '8.0.6.0',
+            'pretty_version' => 'v8.0.8',
+            'version' => '8.0.8.0',
             'type' => 'library',
             'install_path' => __DIR__ . '/../symfony/messenger',
             'aliases' => array(),
-            'reference' => '4be925bf0155d6435d2cdfa63d5ffd277c44ac10',
+            'reference' => '8d0e6b2d5e5dc9d484c6e45117395ae98f0a497a',
             'dev_requirement' => false,
         ),
         'symfony/mime' => array(
@@ -1005,15 +1005,6 @@
             'install_path' => __DIR__ . '/../symfony/property-info',
             'aliases' => array(),
             'reference' => '97524d06a66ae87c59bf9f137420e843cbe4bea0',
-            'dev_requirement' => false,
-        ),
-        'symfony/redis-messenger' => array(
-            'pretty_version' => 'v8.0.6',
-            'version' => '8.0.6.0',
-            'type' => 'symfony-messenger-bridge',
-            'install_path' => __DIR__ . '/../symfony/redis-messenger',
-            'aliases' => array(),
-            'reference' => '706bbc32a8e061af1671c751f3e987bc5df4009b',
             'dev_requirement' => false,
         ),
         'symfony/routing' => array(

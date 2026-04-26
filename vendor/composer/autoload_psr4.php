@@ -42,7 +42,6 @@ return array(
     'Symfony\\Component\\Process\\' => array($vendorDir . '/symfony/process'),
     'Symfony\\Component\\PasswordHasher\\' => array($vendorDir . '/symfony/password-hasher'),
     'Symfony\\Component\\Mime\\' => array($vendorDir . '/symfony/mime'),
-    'Symfony\\Component\\Messenger\\Bridge\\Redis\\' => array($vendorDir . '/symfony/redis-messenger'),
     'Symfony\\Component\\Messenger\\' => array($vendorDir . '/symfony/messenger'),
     'Symfony\\Component\\Mercure\\' => array($vendorDir . '/symfony/mercure/src'),
     'Symfony\\Component\\Mailer\\' => array($vendorDir . '/symfony/mailer'),

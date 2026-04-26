@@ -16,8 +16,8 @@ class ComposerStaticInit0c6059860c1b180d43adf7d924028b6a
         '667aeda72477189d0494fecd327c3641' => __DIR__ . '/..' . '/symfony/var-dumper/Resources/functions/dump.php',
         '7b11c4dc42b3b3023073cb14e519683c' => __DIR__ . '/..' . '/ralouphie/getallheaders/src/getallheaders.php',
         '09f6b20656683369174dd6fa83b7e5fb' => __DIR__ . '/..' . '/symfony/polyfill-uuid/bootstrap.php',
-        '2203a247e6fda86070a5e4e07aed533a' => __DIR__ . '/..' . '/symfony/clock/Resources/now.php',
         '37a3dc5111fe8f707ab4c132ef1dbc62' => __DIR__ . '/..' . '/guzzlehttp/guzzle/src/functions_include.php',
+        '2203a247e6fda86070a5e4e07aed533a' => __DIR__ . '/..' . '/symfony/clock/Resources/now.php',
         'f598d06aa772fa33d905e87be6398fb1' => __DIR__ . '/..' . '/symfony/polyfill-intl-idn/bootstrap.php',
         'ac295ee8be42f266c7e20d14b8cf500a' => __DIR__ . '/..' . '/api-platform/jsonld/HydraContext.php',
         '89efb1254ef2d1c5d80096acd12c4098' => __DIR__ . '/..' . '/twig/twig/src/Resources/core.php',
@@ -74,7 +74,6 @@ class ComposerStaticInit0c6059860c1b180d43adf7d924028b6a
             'Symfony\\Component\\Process\\' => 26,
             'Symfony\\Component\\PasswordHasher\\' => 33,
             'Symfony\\Component\\Mime\\' => 23,
-            'Symfony\\Component\\Messenger\\Bridge\\Redis\\' => 41,
             'Symfony\\Component\\Messenger\\' => 28,
             'Symfony\\Component\\Mercure\\' => 26,
             'Symfony\\Component\\Mailer\\' => 25,
@@ -325,10 +324,6 @@ class ComposerStaticInit0c6059860c1b180d43adf7d924028b6a
         'Symfony\\Component\\Mime\\' => 
         array (
             0 => __DIR__ . '/..' . '/symfony/mime',
-        ),
-        'Symfony\\Component\\Messenger\\Bridge\\Redis\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/symfony/redis-messenger',
         ),
         'Symfony\\Component\\Messenger\\' => 
         array (
