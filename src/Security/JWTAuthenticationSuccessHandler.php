@@ -38,14 +38,14 @@ class JWTAuthenticationSuccessHandler implements AuthenticationSuccessHandlerInt
         );
 
         return new JsonResponse([
-            'status'        => true,
-            'access_token'  => $accessToken,
+            'username'      => $user->getUserName(),
+            'roles'         => $user->getRoles(),
+            'token'         => $accessToken,
             'refresh_token' => $rawRefresh,
             'user'          => [
                 'id'    => $user->getId(),
                 'email' => $user->getUserIdentifier(),
                 'roles' => $user->getRoles(),
-                'role'  => $user->getUserRole(),
             ],
         ]);
     }
