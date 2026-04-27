@@ -1,9 +1,12 @@
 doctrine:
     dbal:
         url: "%env(resolve:DATABASE_URL)%"
-        driver: pdo_mysql
+        driver: mysqli
         server_version: "8.0"
         charset: utf8mb4
+        default_table_options:
+            charset: utf8mb4
+            collate: utf8mb4_unicode_ci
         profiling_collect_backtrace: "%kernel.debug%"
     orm:
         validate_xml_mapping: true
