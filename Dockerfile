@@ -20,6 +20,8 @@ RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-di
 # Wipe cache so it rebuilds fresh at runtime with correct env vars
 RUN rm -rf var/cache/prod var/cache/dev
 
+RUN ls -la config/jwt/ && head -1 config/jwt/private.pem
+
 RUN mkdir -p var/cache var/log && chmod -R 777 var/
 
 EXPOSE 8000
