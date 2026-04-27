@@ -17,15 +17,10 @@ COPY . .
 
 RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist
 
-# Generate unencrypted JWT keys (no passphrase needed)
-RUN mkdir -p config/jwt && \
-    openssl genpkey -algorithm RSA -out config/jwt/private.pem -pkeyopt rsa_keygen_bits:4096 2>/dev/null && \
-    openssl rsa -pubout -in config/jwt/private.pem -out config/jwt/public.pem 2>/dev/null
+# Wipe cache so it rebuilds fresh at runtime with correct env vars
+RUN rm -rf var/cache/prod var/cache/dev
 
-# Ensure var/ is writable
 RUN mkdir -p var/cache var/log && chmod -R 777 var/
-
-RUN php bin/console cache:warmup --env=prod --no-debug --no-interaction 2>/dev/null || true
 
 EXPOSE 8000
 
