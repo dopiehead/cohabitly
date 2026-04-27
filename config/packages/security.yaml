@@ -15,7 +15,7 @@ security:
             security: false
 
         login:
-            pattern: ^/api/login
+            pattern: ^/api/login$
             stateless: true
             provider: app_user_provider
             json_login:
@@ -25,6 +25,11 @@ security:
                 success_handler: App\Security\JWTAuthenticationSuccessHandler
                 failure_handler: lexik_jwt_authentication.handler.authentication_failure
 
+        public:
+            pattern: ^/api/auth/(register|verify-email|refresh|forgot-password|reset-password)$
+            stateless: true
+            security: false
+
         api:
             pattern: ^/api
             stateless: true
@@ -32,18 +37,13 @@ security:
             jwt: ~
 
     access_control:
-        # Public auth routes
-        - { path: ^/api/login, roles: PUBLIC_ACCESS }
-        - { path: ^/api/auth/register, roles: PUBLIC_ACCESS }
-        - { path: ^/api/auth/verify-email, roles: PUBLIC_ACCESS }
-        - { path: ^/api/auth/refresh, roles: PUBLIC_ACCESS }
-        - { path: ^/api/auth/forgot-password, roles: PUBLIC_ACCESS }
-        - { path: ^/api/auth/reset-password, roles: PUBLIC_ACCESS }
-
-        # Public listing browsing
+        - { path: ^/api/login$, roles: PUBLIC_ACCESS }
+        - { path: ^/api/auth/register$, roles: PUBLIC_ACCESS }
+        - { path: ^/api/auth/verify-email$, roles: PUBLIC_ACCESS }
+        - { path: ^/api/auth/refresh$, roles: PUBLIC_ACCESS }
+        - { path: ^/api/auth/forgot-password$, roles: PUBLIC_ACCESS }
+        - { path: ^/api/auth/reset-password$, roles: PUBLIC_ACCESS }
         - { path: ^/api/listing$, roles: PUBLIC_ACCESS, methods: [GET] }
         - { path: ^/api/listing/search, roles: PUBLIC_ACCESS }
         - { path: ^/api/listing/\d+$, roles: PUBLIC_ACCESS, methods: [GET] }
-
-        # Everything else requires auth
         - { path: ^/api, roles: ROLE_USER }
