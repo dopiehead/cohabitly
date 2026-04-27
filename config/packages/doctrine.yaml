@@ -1,6 +1,9 @@
 doctrine:
     dbal:
         url: "%env(resolve:DATABASE_URL)%"
+        driver: pdo_mysql
+        server_version: "8.0"
+        charset: utf8mb4
         profiling_collect_backtrace: "%kernel.debug%"
     orm:
         validate_xml_mapping: true
@@ -19,7 +22,6 @@ doctrine:
 when@test:
     doctrine:
         dbal:
-            # "TEST_TOKEN" is typically set by ParaTest
             dbname_suffix: "_test%env(default::TEST_TOKEN)%"
 
 when@prod:
