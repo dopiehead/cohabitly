@@ -1,21 +1,15 @@
 FROM php:8.4-cli
 
-# Install system deps
 RUN apt-get update && apt-get install -y \
     git unzip libicu-dev libonig-dev libxml2-dev libzip-dev \
     && docker-php-ext-install \
-        pdo \
         pdo_mysql \
         mysqli \
         intl \
         mbstring \
-        xml \
-        ctype \
-        tokenizer \
         zip \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Install Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 WORKDIR /app
