@@ -17,12 +17,10 @@ COPY . .
 
 RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist
 
-# Generate JWT keys if not present (Railway won't have them from .gitignore)
+# Generate unencrypted JWT keys (no passphrase needed)
 RUN mkdir -p config/jwt && \
-    if [ ! -f config/jwt/private.pem ]; then \
-        openssl genpkey -algorithm RSA -out config/jwt/private.pem -pkeyopt rsa_keygen_bits:4096 2>/dev/null; \
-        openssl rsa -pubout -in config/jwt/private.pem -out config/jwt/public.pem 2>/dev/null; \
-    fi
+    openssl genpkey -algorithm RSA -out config/jwt/private.pem -pkeyopt rsa_keygen_bits:4096 2>/dev/null && \
+    openssl rsa -pubout -in config/jwt/private.pem -out config/jwt/public.pem 2>/dev/null
 
 # Ensure var/ is writable
 RUN mkdir -p var/cache var/log && chmod -R 777 var/
