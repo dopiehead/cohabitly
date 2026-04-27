@@ -14,5 +14,5 @@
 ###< symfony/framework-bundle ###
 
 ###> lexik/jwt-authentication-bundle ###
-/config/jwt/*.pem
+# /config/jwt/*.pem  — keys are committed for deployment
 ###< lexik/jwt-authentication-bundle ###
