@@ -22,47 +22,6 @@ final class ListingController extends AbstractController
     // ─────────────────────────────────────────────
     // POST /api/listing  — create listing
     // ─────────────────────────────────────────────
-    #[Route('', name: 'listing_create', methods: ['POST'])]
-    #[IsGranted('ROLE_USER')]
-    public function create(
-        Request $request,
-        PropertyRepository $propertyRepository
-    ): JsonResponse {
-        /** @var User $user */
-        $user = $this->getUser();
-        $data = json_decode($request->getContent(), true) ?? [];
-
-        foreach (['title', 'location', 'price'] as $field) {
-            if (empty($data[$field])) {
-                return $this->json(['status' => false, 'message' => ucfirst($field) . ' is required'], 400);
-            }
-        }
-
-        $listing = new PropertyList();
-        $listing->setTitle($data['title']);
-        $listing->setDescription($data['description'] ?? null);
-        $listing->setLocation($data['location']);
-        $listing->setState($data['state'] ?? null);
-        $listing->setLga($data['lga'] ?? null);
-        $listing->setType($data['type'] ?? null);
-        $listing->setPrice((float) $data['price']);
-        $listing->setRooms((int) ($data['rooms'] ?? 1));
-        $listing->setBathrooms((int) ($data['bathrooms'] ?? 1));
-        $listing->setToilets((int) ($data['toilets'] ?? 1));
-        $listing->setParkingSpace((bool) ($data['parking_space'] ?? false));
-        $listing->setPropertyImages($data['images'] ?? []);
-        $listing->setStatus(PropertyList::STATUS_DRAFT);
-        $listing->setOwner($user);
-
-        if (!empty($data['available_from'])) {
-            $listing->setAvailableFrom(new \DateTime($data['available_from']));
-        }
-
-        $propertyRepository->save($listing);
-
-        return $this->json(['status' => true, 'data' => $this->serializeListing($listing)], 201);
-    }
-
     // ─────────────────────────────────────────────
     // PATCH /api/listing/:id  — update own listing
     // ─────────────────────────────────────────────
@@ -242,44 +201,112 @@ final class ListingController extends AbstractController
     // ─────────────────────────────────────────────
     // POST /api/listing/:id/upload  — upload image via Cloudinary
     // ─────────────────────────────────────────────
-    #[Route('/{id}/upload', name: 'listing_upload', methods: ['POST'])]
-    #[IsGranted('ROLE_USER')]
-    public function upload(
-        int $id,
-        Request $request,
-        PropertyRepository $propertyRepository,
-        CloudinaryService $cloudinary
-    ): JsonResponse {
-        /** @var User $user */
-        $user    = $this->getUser();
-        $listing = $propertyRepository->find($id);
+    #[Route('/create', name: 'listing_create', methods: ['POST'])]
+#[IsGranted('ROLE_USER')]
+public function create(
+    Request $request,
+    PropertyRepository $propertyRepository,
+    CloudinaryService $cloudinary
+): JsonResponse {
+    /** @var User $user */
+    $user = $this->getUser();
 
-        if (!$listing) {
-            return $this->json(['status' => false, 'message' => 'Listing not found'], 404);
+    // Handle form-data OR raw JSON
+    $data = $request->request->all();
+
+    if (empty($data)) {
+        $data = json_decode($request->getContent(), true);
+
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            return $this->json(['status' => false, 'message' => 'Invalid JSON'], 400);
+        }
+    }
+
+    // ───────── VALIDATION ─────────
+    if (!isset($data['title']) || trim($data['title']) === '') {
+        return $this->json(['status' => false, 'message' => 'Title is required'], 400);
+    }
+
+    if (!isset($data['price']) || !is_numeric($data['price']) || $data['price'] < 0) {
+        return $this->json(['status' => false, 'message' => 'Invalid price'], 400);
+    }
+
+    // ───────── CREATE LISTING ─────────
+    $listing = new PropertyList();
+    $listing->setTitle(trim($data['title']));
+    $listing->setDescription($data['description'] ?? null);
+    $listing->setLocation($data['location'] ?? '');
+    $listing->setState($data['state'] ?? null);
+    $listing->setLga($data['lga'] ?? null);
+    $listing->setType($data['type'] ?? null);
+    $listing->setPrice((float) $data['price']);
+    $listing->setRooms((int) ($data['rooms'] ?? 1));
+    $listing->setBathrooms((int) ($data['bathrooms'] ?? 1));
+    $listing->setToilets((int) ($data['toilets'] ?? 1));
+    $listing->setParkingSpace(
+        filter_var($data['parking_space'] ?? false, FILTER_VALIDATE_BOOLEAN)
+    );
+    $listing->setStatus(PropertyList::STATUS_DRAFT);
+    $listing->setOwner($user);
+
+    // Safe date parsing
+    if (!empty($data['available_from'])) {
+        try {
+            $listing->setAvailableFrom(new \DateTime($data['available_from']));
+        } catch (\Exception $e) {
+            return $this->json(['status' => false, 'message' => 'Invalid date'], 400);
+        }
+    }
+
+    // ───────── HANDLE IMAGE UPLOAD ─────────
+    $uploadedImages = [];
+
+    $files = $request->files->all()['images'] ?? [];
+
+    if (!is_array($files)) {
+        $files = [$files];
+    }
+
+    foreach ($files as $file) {
+        if (!$file) continue;
+
+        if (!$file->isValid()) {
+            return $this->json(['status' => false, 'message' => 'Invalid image upload'], 400);
         }
 
-        if ($listing->getOwner()->getId() !== $user->getId()) {
-            return $this->json(['status' => false, 'message' => 'Forbidden'], 403);
+        $allowedMimeTypes = ['image/jpeg', 'image/png', 'image/webp'];
+
+        if (!in_array($file->getMimeType(), $allowedMimeTypes)) {
+            return $this->json(['status' => false, 'message' => 'Invalid image type'], 400);
         }
 
-        $file = $request->files->get('image');
-        if (!$file) {
-            return $this->json(['status' => false, 'message' => 'No image file provided'], 400);
+        if ($file->getSize() > 5 * 1024 * 1024) {
+            return $this->json(['status' => false, 'message' => 'Image too large'], 400);
         }
 
         try {
-            $url    = $cloudinary->upload($file);
-            $images = $listing->getPropertyImages();
-            $images[] = $url;
-            $listing->setPropertyImages($images);
-            $listing->touch();
-            $propertyRepository->save($listing);
-
-            return $this->json(['status' => true, 'data' => ['url' => $url]]);
+            $url = $cloudinary->upload($file);
+            $uploadedImages[] = $url;
         } catch (\Throwable $e) {
-            return $this->json(['status' => false, 'message' => $e->getMessage()], 500);
+            return $this->json(['status' => false, 'message' => 'Upload failed'], 500);
         }
     }
+
+    // Limit images
+    if (count($uploadedImages) > 10) {
+        return $this->json(['status' => false, 'message' => 'Max 10 images allowed'], 400);
+    }
+
+    $listing->setPropertyImages($uploadedImages);
+
+    // ───────── SAVE ─────────
+    $propertyRepository->save($listing);
+
+    return $this->json([
+        'status' => true,
+        'data'   => $this->serializeListing($listing)
+    ], 201);
+}
 
     // ─────────────────────────────────────────────
     // Serializer helper
