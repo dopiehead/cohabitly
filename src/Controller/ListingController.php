@@ -120,9 +120,9 @@ final class ListingController extends AbstractController
             return $propertyRepository->countActive();
         });
 
-        $limitss = 10;
-        $properties = $propertyRepository->findLatest($limitss);
-        dd($properties);
+        // $limitss = 10;
+        // $properties = $propertyRepository->findLatest($limitss);
+        // dd($properties);
 
         return $this->json([
             'status' => true,
