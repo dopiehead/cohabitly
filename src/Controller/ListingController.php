@@ -45,6 +45,7 @@ final class ListingController extends AbstractController
         }
 
         $data = json_decode($request->getContent(), true) ?? [];
+        
 
         if (isset($data['title']))          $listing->setTitle($data['title']);
         if (isset($data['description']))    $listing->setDescription($data['description']);
@@ -118,6 +119,10 @@ final class ListingController extends AbstractController
             $item->expiresAfter(300);
             return $propertyRepository->countActive();
         });
+
+        $limitss = 10;
+        $properties = $propertyRepository->findLatest($limitss);
+        dd($properties);
 
         return $this->json([
             'status' => true,
@@ -198,6 +203,7 @@ final class ListingController extends AbstractController
         return $this->json(['status' => true, 'data' => $this->serializeListing($listing)]);
     }
 
+    //listing/search
     // ─────────────────────────────────────────────
     // POST /api/listing/:id/upload  — upload image via Cloudinary
     // ─────────────────────────────────────────────
